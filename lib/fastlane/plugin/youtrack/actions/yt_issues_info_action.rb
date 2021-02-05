@@ -24,8 +24,8 @@ module Fastlane
 
           begin
             response_body = JSON.parse(result.body)
-            info[:title] = response_body["summary"]
-            info[:description] = response_body["description"]
+            info[:title] = response_body['summary']
+            info[:description] = response_body['description']
           rescue JSON::ParserError => e
             puts e
             return info
