@@ -33,7 +33,7 @@ module Fastlane
 
           info
         end
-        
+
         return issues_info
       rescue => ex
         UI.error(ex)
@@ -98,7 +98,6 @@ module Fastlane
       def self.return_type
         :array
       end
-
     end
   end
 end

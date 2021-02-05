@@ -12,7 +12,7 @@ module Fastlane
       def self.get_issue_info(issue_id, fields, url, token)
         Faraday.get("#{url}/api/issues/#{issue_id}") do |req|
           req.params['fields'] = fields.join(',')
-  
+
           req.headers['Content-Type'] = 'application/json'
           req.headers['Accept'] = 'application/json'
           req.headers['Cache-Control'] = 'no-cache'
