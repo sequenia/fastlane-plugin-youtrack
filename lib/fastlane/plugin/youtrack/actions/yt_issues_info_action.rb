@@ -3,6 +3,9 @@ require_relative '../helper/youtrack_helper'
 
 module Fastlane
   module Actions
+    module SharedValues
+      YOUTRACK_RELEASED_ISSUES ||= :YOUTRACK_RELEASED_ISSUES # originally defined in IncrementBuildNumberAction
+    end
     class YtIssuesInfoAction < Action
       def self.run(params)
         isssue_ids = params[:issue_ids]
@@ -33,6 +36,8 @@ module Fastlane
 
           info
         end
+
+        Actions.lane_context[SharedValues::YOUTRACK_RELEASED_ISSUES] = issues_info
 
         return issues_info
       rescue => ex
@@ -92,6 +97,12 @@ module Fastlane
       def self.example_code
         [
           'yt_issues_info(issue_ids: ["ios_1234", "ios_5678", "ios_4321"])'
+        ]
+      end
+
+      def self.output
+        [
+          ['YOUTRACK_RELEASED_ISSUES', 'Array of released issues']
         ]
       end
 
