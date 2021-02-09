@@ -10,13 +10,8 @@ module Fastlane
       def self.run(params)
         isssue_ids = params[:issue_ids]
         fields = params[:issue_fields]
-        must_be_converted = params[:must_be_converted]
         base_url = params[:base_url]
         access_token = params[:access_token]
-
-        if must_be_converted
-          isssue_ids = isssue_ids.map { |id| id.upcase.gsub('_', '-') }
-        end
 
         issues_info = isssue_ids.map do |issue_id|
           info = {
@@ -27,8 +22,7 @@ module Fastlane
 
           begin
             response_body = JSON.parse(result.body)
-            info[:title] = response_body['summary']
-            info[:description] = response_body['description']
+            fields.each { |field| info[field.to_sym] = response_body[field] }
           rescue JSON::ParserError => e
             puts e
             return info
@@ -59,11 +53,6 @@ module Fastlane
                                        description: 'Array of issue\'s ids',
                                        optional: false,
                                        type: Array),
-          FastlaneCore::ConfigItem.new(key: :must_be_converted,
-                                       description: 'Sign to convert identifiers into camel-kebab case (from ios_1234 to IOS-1234)',
-                                       optional: true,
-                                       default_value: true,
-                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :issue_fields,
                                        description: 'Array of neccessary fields of issue',
                                        optional: true,
