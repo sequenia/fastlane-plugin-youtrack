@@ -8,13 +8,14 @@ module Fastlane
     end
     class YtIssuesInfoAction < Action
       def self.run(params)
-        isssue_ids = params[:issue_ids]
+        issue_ids = params[:issue_ids]
         fields = params[:issue_fields]
         base_url = params[:base_url]
         access_token = params[:access_token]
 
-        issues_info = isssue_ids.map do |issue_id|
+        issues_info = issue_ids.map do |issue_id|
           info = {
+            id: issue_id,
             url: "#{base_url}/issue/#{issue_id}"
           }
           result = Helper::YoutrackHelper.get_issue_info(issue_id, fields, base_url, access_token)
@@ -33,7 +34,7 @@ module Fastlane
 
         Actions.lane_context[SharedValues::YOUTRACK_RELEASED_ISSUES] = issues_info
 
-        return issues_info
+        issues_info
       rescue => ex
         UI.error(ex)
         UI.error('Failed')
@@ -49,25 +50,33 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :issue_ids,
-                                       description: 'Array of issue\'s ids',
-                                       optional: false,
-                                       type: Array),
-          FastlaneCore::ConfigItem.new(key: :issue_fields,
-                                       description: 'Array of neccessary fields of issue',
-                                       optional: true,
-                                       default_value: ['summary', 'description'],
-                                       type: Array),
-          FastlaneCore::ConfigItem.new(key: :base_url,
-                                       env_name: 'YOUTRACK_BASE_URL',
-                                       description: 'Base YouTrack URL',
-                                       optional: false,
-                                       type: String),
-          FastlaneCore::ConfigItem.new(key: :access_token,
-                                       env_name: 'YOUTRACK_API_TOKEN',
-                                       description: 'Access token for YouTrack API',
-                                       optional: false,
-                                       type: String)
+          FastlaneCore::ConfigItem.new(
+            key: :issue_ids,
+            description: 'Array of issue\'s ids',
+            optional: false,
+            type: Array
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :issue_fields,
+            description: 'Array of neccessary fields of issue',
+            optional: true,
+            default_value: ['summary', 'description'],
+            type: Array
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :base_url,
+            env_name: 'YOUTRACK_BASE_URL',
+            description: 'Base YouTrack URL',
+            optional: false,
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :access_token,
+            env_name: 'YOUTRACK_API_TOKEN',
+            description: 'Access token for YouTrack API',
+            optional: false,
+            type: String
+          )
         ]
       end
 

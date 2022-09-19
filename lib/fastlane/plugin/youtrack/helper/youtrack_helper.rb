@@ -19,6 +19,20 @@ module Fastlane
           req.headers['Authorization'] = "Bearer #{token}"
         end
       end
+
+      def self.comment_issue(issue_id, comment, url, token)
+        Faraday.post("#{url}/api/issues/#{issue_id}/comments") do |req|
+          body = {
+            text: comment
+          }
+          req.body = JSON.generate(body)
+
+          req.headers['Content-Type'] = 'application/json'
+          req.headers['Accept'] = 'application/json'
+          req.headers['Cache-Control'] = 'no-cache'
+          req.headers['Authorization'] = "Bearer #{token}"
+        end
+      end
     end
   end
 end
