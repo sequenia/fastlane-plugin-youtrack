@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'fastlane-plugin-youtrack'
   spec.version       = Fastlane::Youtrack::VERSION
   spec.author        = 'Semen Kologrivov'
-  spec.email         = 'firedragon855@gmail.com'
+  spec.email         = 'semen@sequenia.com'
 
   spec.summary       = 'Use for communicating with YouTrack (fetching issue\'s info, adding comments and tags etc.)'
   spec.license       = "MIT"
