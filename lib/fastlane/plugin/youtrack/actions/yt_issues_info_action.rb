@@ -10,6 +10,7 @@ module Fastlane
       def self.run(params)
         issue_ids = params[:issue_ids]
         fields = params[:issue_fields]
+        custom_fields_names = params[:issue_custom_fields_names]
         base_url = params[:base_url]
         access_token = params[:access_token]
 
@@ -18,12 +19,46 @@ module Fastlane
             id: issue_id,
             url: "#{base_url}/issue/#{issue_id}"
           }
-          result = Helper::YoutrackHelper.get_issue_info(issue_id, fields, base_url, access_token)
-          return info unless result.success?
+
+          issue_info_result = Helper::YoutrackHelper.get_issue_info(
+            issue_id,
+            fields,
+            base_url,
+            access_token
+          )
+          return info unless issue_info_result.success?
 
           begin
-            response_body = JSON.parse(result.body)
-            fields.each { |field| info[field.to_sym] = response_body[field] }
+            issue_info_response_body = JSON.parse(issue_info_result.body)
+            fields.each { |field| info[field.to_sym] = issue_info_response_body[field] }
+          rescue JSON::ParserError => e
+            puts e
+            return info
+          end
+
+          issue_custom_fields_result = Helper::YoutrackHelper.get_issue_custom_fields(
+            issue_id,
+            base_url,
+            access_token
+          )
+
+          return info unless issue_custom_fields_result.success?
+
+          begin
+            issue_custom_fields_response_body = JSON.parse(issue_custom_fields_result.body)
+            custom_fields_names.each do |field_name|
+              custom_field = issue_custom_fields_response_body.find { |field| 
+                field['name'] == field_name
+              }
+
+              next if custom_field.nil?
+
+              info[field_name.to_sym] = {
+                type: custom_field['$type'],
+                name: custom_field['name'],
+                value: custom_field['value']['name']
+              }
+            end
           rescue JSON::ParserError => e
             puts e
             return info
@@ -61,6 +96,13 @@ module Fastlane
             description: 'Array of neccessary fields of issue',
             optional: true,
             default_value: ['summary', 'description'],
+            type: Array
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :issue_custom_fields_names,
+            description: 'Array of names of neccessary custom fields of issue',
+            optional: true,
+            default_value: ['Kanban State', 'Stage'],
             type: Array
           ),
           FastlaneCore::ConfigItem.new(
